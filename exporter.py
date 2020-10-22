@@ -3,6 +3,7 @@
 from prometheus_client import start_http_server, Gauge
 import random
 import time
+import obd
 
 # Create a metric
 ENGINE_LOAD         = Gauge('engine_load', 'Calculated engine load')
@@ -22,8 +23,8 @@ commands = {
 formulas = {
     'engine_load':  '/2.55',
     'coolant_temp': '-40',
-    'short_fuel_trim_1': '/1.28-100',
-    'rpm': '/4'
+    'short_fuel_trim_1': '/1.28-100'
+    #'rpm': '/4'
 }
 
 def get_obd(connection):
@@ -32,7 +33,7 @@ def get_obd(connection):
         if cmd.name.lower() == prom._name:
             if prom._name in formulas:
                 response = connection.query(cmd)
-                formula_val = eval(str(response.value.magnitude+formulas[prom._name]))
+                formula_val = eval(str(response.value.magnitude)+formulas[prom._name])
                 prom.set(formula_val)
             else:
                 response = connection.query(cmd)
