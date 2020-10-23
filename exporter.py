@@ -4,6 +4,7 @@ from prometheus_client import start_http_server, Gauge
 import random
 import time
 import obd
+import sys
 
 # Create a metric
 ENGINE_LOAD         = Gauge('engine_load', 'Calculated engine load')
@@ -45,6 +46,11 @@ if __name__ == '__main__':
     print("start server...")
 
     connection = obd.OBD("/dev/rfcomm0")
+    if connection.status() != odb.OBDStatus.CAR_CONNECTED:
+        print("ELM327 is not connected!!")
+        sys.exit(1)
+    else:
+        print("start reading OBD2 info and export to prometheus...")
 
     # Generate some requests.
     while True:
