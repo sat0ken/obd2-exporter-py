@@ -21,32 +21,20 @@ commands = {
     obd.commands.SPEED: SPEED
 }
 
-formulas = {
-    'engine_load':  '/2.55',
-    'coolant_temp': '-40',
-    'short_fuel_trim_1': '/1.28-100'
-    #'rpm': '/4'
-}
-
 def get_obd(connection):
 
     for cmd, prom in commands.items():
         if cmd.name.lower() == prom._name:
-            if prom._name in formulas:
-                response = connection.query(cmd)
-                formula_val = eval(str(response.value.magnitude)+formulas[prom._name])
-                prom.set(formula_val)
-            else:
-                response = connection.query(cmd)
-                prom.set(response.value.magnitude)
+            response = connection.query(cmd)
+            prom.set(response.value.magnitude)
 
 if __name__ == '__main__':
     # Start up the server to expose the metrics.
     start_http_server(8000)
     print("start server...")
 
-    connection = obd.OBD("/dev/rfcomm0")
-    if connection.status() != odb.OBDStatus.CAR_CONNECTED:
+    connection = obd.OBD("/dev/rfcomm1")
+    if connection.status() != obd.OBDStatus.CAR_CONNECTED:
         print("ELM327 is not connected!!")
         sys.exit(1)
     else:
